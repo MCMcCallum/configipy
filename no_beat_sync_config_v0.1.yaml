@@ -7,13 +7,13 @@ cqt:
   num_windows: 1024                 # <= Number of consecutive CQT windows per example
 
 beat_cqt_triplet:
-  beats_after: 4                    # <= Number of beats ahead of a randomly selected time point to form cqt segment
-  beats_before: 4                   # <= Number of beats behind a randomly selected time point to form cqt segment
+  beats_after: 512                    # <= Number of beats ahead of a randomly selected time point to form cqt segment
+  beats_before: 512                   # <= Number of beats behind a randomly selected time point to form cqt segment
   probability_before_positive: 0.5  # <= Probability that the positive triplet example is before the anchor (or 1.0 minus the probability it is after)
-  min_offset_positive: 8            # <= Minimum offset in beats of the center of the positive triplet example from the center of the anchor
-  max_offset_positive: 12           # <= Maximum offset in beats of the center of the positive triplet example from the center of the anchor
+  min_offset_positive: 1024            # <= Minimum offset in beats of the center of the positive triplet example from the center of the anchor
+  max_offset_positive: 2048           # <= Maximum offset in beats of the center of the positive triplet example from the center of the anchor
   probability_before_negative: 0.5  # <= Probability that the negative triplet example is before the anchor (or 1.0 minus the probability it is after)
-  min_offset_negative: 32           # <= Minimum offset in beats of the center of the negative triplet example from the center of the anchor
+  min_offset_negative: 4096           # <= Minimum offset in beats of the center of the negative triplet example from the center of the anchor
   max_offset_negative: 999999999999 # <= Maximum offset in beats of the center of the negative triplet example from the center of the anchor
 
 beat_track_config:
