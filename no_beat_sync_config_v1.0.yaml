@@ -15,11 +15,4 @@ beat_cqt_triplet:
   probability_before_negative: 0.5  # <= Probability that the negative triplet example is before the anchor (or 1.0 minus the probability it is after)
   min_offset_negative: 4096           # <= Minimum offset in beats of the center of the negative triplet example from the center of the anchor
   max_offset_negative: 999999999999 # <= Maximum offset in beats of the center of the negative triplet example from the center of the anchor
-
-beat_track_config:
-  beatgrid_min_bpm: 70              # <= Minimum BPM parameter for the beatgrid tracker
-  beatgrid_max_bpm: 200             # <= Maximum BPM parameter for the beatgrid tracker
-
-beat_cqt_triplet_sampler:
   probability_same_file: 0.8        # <= Probability that the negative sample in the triplet is from the same file or different file to the anchor
-  batch_size: 10                    # <= Total number of triplets to produce per batch
