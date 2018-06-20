@@ -24,10 +24,11 @@ def add_config_path(path):
         path -> str - A string describing an absolute path to a set of configuration files.
     """
     global CONFIG_PATHS
-    CONFIG_PATHS += [path]
-    config_files = dir_funcs.get_filenames(path, ['.yaml'])
-    num_files = len([fname for fname in config_files if fname.rfind('_v')>=0])
-    print("Found " + str(num_files) + " configuration files.")
+    if path not in CONFIG_PATHS:
+        CONFIG_PATHS += [path]
+        config_files = dir_funcs.get_filenames(path, ['.yaml'])
+        num_files = len([fname for fname in config_files if fname.rfind('_v')>=0])
+        print("Found " + str(num_files) + " configuration files.")
 
 
 class Config(dict):
