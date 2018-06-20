@@ -13,19 +13,19 @@ import yaml
 import os
 
 
-CONFIG_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'config/')
+CONFIG_PATHS = [os.path.join(os.path.dirname(os.path.realpath(__file__)), 'config/')]
 
 
-def set_config_path(path):
+def add_config_path(path):
     """
     Sets the path to the yaml configuration files that is searched for these files.
 
     Args:
         path -> str - A string describing an absolute path to a set of configuration files.
     """
-    global CONFIG_PATH
-    CONFIG_PATH = path
-    config_files = dir_funcs.get_filenames(CONFIG_PATH, ['.yaml'])
+    global CONFIG_PATHS
+    CONFIG_PATHS += [path]
+    config_files = dir_funcs.get_filenames(path, ['.yaml'])
     num_files = len([fname for fname in config_files if fname.rfind('_v')>=0])
     print("Found " + str(num_files) + " configuration files.")
 
@@ -46,7 +46,9 @@ class Config(dict):
         Args:
              version_str -> str - A string specifying which feature configuration to get.
         """
-        config_files = dir_funcs.get_filenames(CONFIG_PATH, ['.yaml'])
+        config_files = []
+        for cfg_path in CONFIG_PATHS:
+            config_files += dir_funcs.get_filenames(CONFIG_PATH, ['.yaml'])
         config_names = [os.path.splitext(os.path.basename(name))[0] for name in config_files]
         config_names = [name[(name.rfind('_v')+1):] for name in config_names]
         config_file = config_files[config_names.index(version_str)]
