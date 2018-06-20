@@ -13,7 +13,7 @@ from config import Config
 cfg = Config('v0.0')
 ```
 
-where "v1.0" exists at the end of the filename of the desired yaml file.
+where "v0.0" exists at the end of the filename of the desired yaml file.
 
 Configurable objects are a subclass of the Configurable class:
 
