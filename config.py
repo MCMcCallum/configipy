@@ -49,7 +49,7 @@ class Config(dict):
         """
         config_files = []
         for cfg_path in CONFIG_PATHS:
-            config_files += dir_funcs.get_filenames(CONFIG_PATH, ['.yaml'])
+            config_files += dir_funcs.get_filenames(cfg_path, ['.yaml'])
         config_names = [os.path.splitext(os.path.basename(name))[0] for name in config_files]
         config_names = [name[(name.rfind('_v')+1):] for name in config_names]
         config_file = config_files[config_names.index(version_str)]
