@@ -3,6 +3,5 @@
 #
 
 experiment_config:
-	batch_size: 128
-	epochs: 256
-	
+  batch_size: 128
+  epochs: 256

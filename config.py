@@ -36,8 +36,6 @@ class Config(dict):
     A simple class that encapsulates feature configuration files stored in yaml format.
     Each feature configuration file should contain all the details that make a feature unique for a certain type, e.g.,
     a CQT.
-
-    # TODO [matthew.mccallum 06.16.18]: This config module should be moved to the parent repo, or perhaps a separate module, it isn't really specific to data creation. It could be used for just regular analysis too.
     """
 
     def __init__(self, version_str='v0.0'):
@@ -55,3 +53,13 @@ class Config(dict):
         config_file = config_files[config_names.index(version_str)]
         with open(config_file) as f:
             self.update(yaml.safe_load(f))
+
+    def Save(self, url):
+        """
+        Saves a the configuration fields in yaml format to disk.
+
+        Args:
+            url -> str - The url specifying the location and filename to save to.
+        """
+        with open(url, 'w') as f:
+            f.write(yaml.dump(self, default_flow_style=False))
