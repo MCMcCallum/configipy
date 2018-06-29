@@ -62,4 +62,4 @@ class Config(dict):
             url -> str - The url specifying the location and filename to save to.
         """
         with open(url, 'w') as f:
-            f.write(yaml.dump(self, default_flow_style=False))
+            f.write(yaml.safe_dump({k: v for k, v in self.items()}, default_flow_style=False))
