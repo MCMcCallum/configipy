@@ -49,8 +49,15 @@ def class_for_config(module, config, base_class=Configurable):
     # Search for matching configuration
     config_fields = config.keys()
     matching_classes = [c_field for c_field in config_fields if c_field in feature_class_names]
-    if len(matching_classes) != 1:
+    if not len(matching_classes):
         raise KeyError('Provided configuration does not match any, or matches multiple classes in the provided module')
-    cls_idx = feature_class_names.index(matching_classes[0])
-    f_class = feature_classes[cls_idx]
-    return f_class
+
+    # Get all matching classes
+    f_classes = [feature_classes[feature_class_names.index(match_cls)] for match_cls in matching_classes]
+
+    # Return one class if there is only one
+    if len(f_classes) == 1:
+        return f_classes[0]
+
+    # Otherwise return the list of classes
+    return f_classes
