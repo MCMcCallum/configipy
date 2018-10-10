@@ -58,14 +58,13 @@ class Configurable(object):
             template: list() - A list of keys that describe the required fields to be configured for this object.
             This may includ dictionaries, allowing a heirarchy in the provided configuration.
         """
-        # TODO [matthew.mccallum 06.16.18]: Add information to the error below to explain which configuration field was missing.
         for field in template:
             if isinstance(field, dict):
                 for key in field.keys():
                     if key not in cfg.keys():
-                        print(key)
+                        print(key + " value not found in " + self.__class__.__name__ + " object configuration")
                         raise InvalidConfigError
                     self._verifyConfig(cfg[key], field[key])
             elif field not in cfg.keys():
-                print(field)
+                print(field + " value not found in " + self.__class__.__name__ + " object configuration")
                 raise InvalidConfigError
