@@ -35,6 +35,8 @@ class Configurable(object):
     
     _REQUIRED_CONFIG = []
 
+    _CONFIG_DEFAULTS = {}
+
     def __init__(self, cfg):
         """
         Constructor.
@@ -42,11 +44,34 @@ class Configurable(object):
         Args:
             cfg: dict - An object providing the configuration parameters for this object.
         """
+        # Populate defaults
+        self._populateDefaults(cfg, self._CONFIG_DEFAULTS)
+
+        # Verify configuration
         self._verifyConfig(cfg, self._REQUIRED_CONFIG)
+
+        # Set properties
         self._cfg = cfg
         for name in self._REQUIRED_CONFIG:
             if type(name) is str:
                 setattr(self, "_"+name, cfg[name])
+
+    def _populateDefaults(self, cfg, defaults):
+        """
+        Iterates through all of the items in the defaults and transfers them over to the configuration
+        if they are not already there.
+
+        Args:
+            cfg: dict() - An object to be used to configure a configurable class
+
+            defaults: dict() - A set of defaults to configure in `cfg` if they do not already exist there.
+        """
+        for field, value in defaults.items():
+            if field not in cfg.keys():
+                cfg[field] = value
+            elif isinstance(value, dict):
+                # Check the sub fields
+                self._populateDefaults(cfg[field], value)
 
     def _verifyConfig(self, cfg, template):
         """
