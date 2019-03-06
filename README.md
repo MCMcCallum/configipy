@@ -1,35 +1,8 @@
-# config
-A small library to assist with creating classes that are configurable via yaml files.
+Configipy
+===
 
-Sometimes it's just easier to read a yaml file for an experiment configuration than searchig through code.
+This module is the source code of the configipy python package.
 
-The idea is to have a light wrapper around loading yaml files into dictionaries, and an interface for classes whose attributes are set by these yaml dictionaries.
+For docs, please refer [here](https://github.com/MCMcCallum/configipy-dist).
 
-For example a configuration object is created via:
-
-```
-from config import Config
-
-cfg = Config('v0.0')
-```
-
-where "v0.0" exists at the end of the filename of the desired yaml file.
-
-Configurable objects are a subclass of the Configurable class:
-
-```
-from config import Configurable
-from config import Config
-
-class ConfigurableSubclass(Configurable):
-
-	def PrintBatchSize(self):
-		print(str(self._batch_size))
-
-cfg = Config('v0.0')
-
-example = ConfigurableSubclass(cfg['experiment_config'])
-example.PrintBatchSize()
-```
-
-Should output `128`.
+This source code is in a separate repository so that it may be included directly as a git submodule, but it is recommended to pip install the entire package where possible.
