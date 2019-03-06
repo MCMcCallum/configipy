@@ -6,7 +6,7 @@ Sometimes it's just easier to read a yaml file for an experiment configuration t
 
 The idea is to have a light wrapper around loading yaml files into dictionaries, and an interface for classes whose attributes are set by these yaml dictionaries.
 
-This provides a couple of advantages over direct python object configuration:
+This provides a couple of advantages over direct python object configuration with something like `ruamel.yaml`:
  - It allows you to dump no only classes but hierarchies of classes to file
  - It is designed to provide an easy way to define classes by manually writing yaml files rather than saving and alter loading yaml files
  - It allows you to simply specify the parameters that are important to save to yaml, preventing saving of large data structures such as matrices
@@ -25,7 +25,7 @@ where "filename.yaml" exists at the end of the filename of the desired yaml file
 Configurable objects are a subclass of the Configurable class. For example a class with a `class_configuration.yaml` yaml file:
 
 ```
-# This yaml file is for a class witha  batch size parameter
+# This yaml file is for a class with a batch size parameter
 
 ConfigurableSubclass:
     _batch_size: 128
