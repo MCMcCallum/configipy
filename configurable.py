@@ -10,7 +10,7 @@ Created 06-17-18 by Matt C. McCallum
 # None.
 
 # Python standard library imports
-# None.
+import copy
 
 
 class InvalidConfigError(Exception):
@@ -93,3 +93,13 @@ class Configurable(object):
             elif field not in cfg.keys():
                 print(field + " value not found in " + self.__class__.__name__ + " object configuration")
                 raise InvalidConfigError
+
+    @property
+    def cfg(self):
+        """
+        Getter function for a copy of this objects configuration.
+
+        Return:
+            dict{str:value} : A hierarchical dictionary of this class's configuration and all classes therein.
+        """
+        return copy.copy(self._cfg)
