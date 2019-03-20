@@ -11,6 +11,8 @@ import yaml
 
 # Python standard library imports
 import os
+import json
+import hashlib
 
 
 class Config(dict):
@@ -48,3 +50,24 @@ class Config(dict):
         else:
             config_file.write(yaml.safe_dump({k: v for k, v in self.items()}, default_flow_style=False))
             
+    @property
+    def json(self):
+        """
+        Returns a string containing a json version of the dictionary that is unique for a unique configuration,
+        and identical for identical configurations.
+
+        Return:
+            str - A json formatted string describing the dictionary contents
+        """
+        return json.dumps(self, sort_keys=True)
+
+    @property
+    def hashid(self):
+        """
+        Returns an identifier that will be the same for identical dictionary contents.
+        Note there may be a hash collision here for two distinct contents, but it is very unlikely.
+
+        Return:
+            str - A string containing a hex representation of the hashed dictionary.
+        """
+        return hashlib.sha256(self.json).hexdigest
