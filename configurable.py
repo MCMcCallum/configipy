@@ -44,6 +44,9 @@ class Configurable(object):
         Args:
             cfg: dict - An object providing the configuration parameters for this object.
         """
+        # Save configuration dictionary
+        self._cfg = cfg[self.__class__.__name__]
+
         # Populate defaults
         self._populateDefaults(cfg, self._CONFIG_DEFAULTS)
 
@@ -51,10 +54,23 @@ class Configurable(object):
         self._verifyConfig(cfg, self._REQUIRED_CONFIG)
 
         # Set properties
-        self._cfg = cfg
         for name in self._REQUIRED_CONFIG:
             if type(name) is str:
                 setattr(self, "_"+name, cfg[name])
+
+    @classmethod
+    def GetSubclasses(cls):
+        """
+        Get all subclasses for this class and place them in a dictionary for indexing and constructing classes from.
+
+        Return:
+            dict - A dictionary mapping class names to classes for all current subclasses of this class.
+        """
+        all_subclasses = []
+        for subclass in cls.__subclasses__():
+            all_subclasses.append(subclass)
+            all_subclasses.extend(subclass._getSubclassNames())
+        return {subcls.__name__: subcls for subcls in all_subclasses}
 
     def _populateDefaults(self, cfg, defaults):
         """
