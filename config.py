@@ -70,4 +70,4 @@ class Config(dict):
         Return:
             str - A string containing a hex representation of the hashed dictionary.
         """
-        return hashlib.sha256(self.json).hexdigest
+        return hashlib.sha256(self.json.encode()).hexdigest()
