@@ -33,9 +33,9 @@ class Configurable(object):
     up to the derived class to use these values.
     """
     
-    _REQUIRED_CONFIG = []
+    _REQUIRED_CONFIG = []   # <= Parameters that must be specified in the class configuration every time
 
-    _CONFIG_DEFAULTS = {}
+    _CONFIG_DEFAULTS = {}   # <= Parameters that are optional, and if not provided, will assume default values
 
     def __init__(self, cfg):
         """
@@ -48,15 +48,16 @@ class Configurable(object):
         self._cfg = cfg[self.__class__.__name__]
 
         # Populate defaults
-        self._populateDefaults(cfg, self._CONFIG_DEFAULTS)
+        self._populateDefaults(self._cfg, self._CONFIG_DEFAULTS)
 
         # Verify configuration
-        self._verifyConfig(cfg, self._REQUIRED_CONFIG)
+        self._verifyConfig(self._cfg, self._REQUIRED_CONFIG)
 
         # Set properties
-        for name in self._REQUIRED_CONFIG:
+        total_config = self._REQUIRED_CONFIG + list(self._CONFIG_DEFAULTS.keys())
+        for name in total_config:
             if type(name) is str:
-                setattr(self, "_"+name, cfg[name])
+                setattr(self, "_"+name, self._cfg[name])
 
     @classmethod
     def GetSubclasses(cls):
