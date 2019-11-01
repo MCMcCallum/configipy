@@ -4,7 +4,7 @@ Created 10-16-19 by Matt C. McCallum
 
 
 # Local imports
-from . import features
+# None
 
 # Third party imports
 # None.
@@ -31,12 +31,13 @@ def class_for_config(base_class, config):
     or Config is a class in the pandafeet features module.
 
     Args:
-        base_class: object - 
+        base_class: object - The base class for which you want to search for derived 
+        classes of.
 
         config: dict - A dictionary with the keys specifying class names in the pandafeet
         features module.
     """
-    fclsses = _all_subclasses(features.timeline_feature.TimelineFeature)
+    fclsses = _all_subclasses(base_class)
     feature_class_names = [clsobj.__name__ for clsobj in fclsses]
 
     # Search for matching configuration

@@ -22,17 +22,22 @@ class Config(dict):
     a CQT.
     """
 
+    # TODO [matt.c.mccallum 07.03.19]: Allow loading a whole folder of configs
+    # TODO [matt.c.mccallum 07.03.19]: Allow linking or references between configs to avoid duplication
+
     def __init__(self, config_file):
         """
         Constructor.
 
         Args:
-            config_file: str or file - A file like object or filename describing a yaml file to load
-            this class's configuration from. 
+            config_file: str, dict or file - A file like object or filename describing a yaml file to load
+            this class's configuration from. Alternatively, it can be a dictionary describing the 
         """
         if type(config_file) is str:
             with open(config_file) as f:
                 self.update(yaml.safe_load(f))
+        elif type(config_file) is dict:
+            self.update(config_file)
         else:
             self.update(yaml.safe_load(f))
 
