@@ -1,59 +1,54 @@
 """
-Created 06-29-18 by Matt C. McCallum
+Created 10-16-19 by Matt C. McCallum
 """
 
 
 # Local imports
-from .configurable import Configurable
+from . import features
 
 # Third party imports
 # None.
 
 # Python standard library imports
-import sys
-import inspect
+# None.
 
 
-def class_for_config(module, config, base_class=Configurable):
+def _all_subclasses(cls):
     """
-    Returns a class for a given configuration. 
-    It is expected that the class configuration in the config dict is under the key of 
-    the class name at the root level of the config dictionary.
-    If there are multiple classes matching in the configuration dictionary, they can either
-    be separated out before calling this function, or the user can specify a base class, of
-    which the returned class must be a child of. Thereby essentially filtering the potential
-    classes by the base class.
+    cls.__subclasses__ only transcends one level of inheretance so this is a simple 
+    recursion to find all subclasses.
 
     Args:
-        module -> module - The module in which to search for classes in.
-
-        config -> dict - The configuration dictionary to find a matching class for. Note that
-        the root keys in this dictionary must match one and only one class that is a child of
-        "base_class".
-
-        base_class -> class - The base class, of which the returned class must be a 
-        child of.
-
-    Return:
-        dict -> The set of configuration parameters for config that were under the key of the
-        matching class
-
-        class -> The class whose name matches a root key in the config dict.
+        cls: object - The class to find all subclasses for.
     """
-    # Get module details
-    parent_module_name = module.__name__
-    feature_classes = inspect.getmembers(sys.modules[parent_module_name], inspect.isclass)    # => Note returns a 2 element tuple, the first element is the class name as a string and the second element the class itself.
-    feature_classes = [f_class[1] for f_class in feature_classes if issubclass(f_class[1], base_class)]
-    feature_class_names = [f_class.__name__ for f_class in feature_classes]
+    return list(set(cls.__subclasses__()).union([s for c in cls.__subclasses__() for s in _all_subclasses(c)]))
+
+
+def class_for_config(base_class, config):
+    """
+    Returns the feature class for a given config dictionary or Configipy Config object.
+    This class search is performed under the assumption that each key in the dictionary
+    or Config is a class in the pandafeet features module.
+
+    Args:
+        base_class: object - 
+
+        config: dict - A dictionary with the keys specifying class names in the pandafeet
+        features module.
+    """
+    fclsses = _all_subclasses(features.timeline_feature.TimelineFeature)
+    feature_class_names = [clsobj.__name__ for clsobj in fclsses]
 
     # Search for matching configuration
     config_fields = config.keys()
     matching_classes = [c_field for c_field in config_fields if c_field in feature_class_names]
     if not len(matching_classes):
+        print(feature_class_names)
+        print(config_fields)
         raise KeyError('Provided configuration does not match any, or matches multiple classes in the provided module')
 
     # Get all matching classes
-    f_classes = [feature_classes[feature_class_names.index(match_cls)] for match_cls in matching_classes]
+    f_classes = [fclsses[feature_class_names.index(match_cls)] for match_cls in matching_classes]
 
     # Return one class if there is only one
     if len(f_classes) == 1:
