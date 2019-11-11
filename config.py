@@ -39,7 +39,7 @@ class Config(dict):
         elif type(config_file) is dict:
             self.update(config_file)
         else:
-            self.update(yaml.safe_load(f))
+            self.update(yaml.safe_load(config_file))
 
     def Save(self, config_file):
         """
