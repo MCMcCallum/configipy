@@ -36,6 +36,9 @@ def class_for_config(base_class, config):
 
         config: dict - A dictionary with the keys specifying class names in the pandafeet
         features module.
+
+    Return:
+        class - The class that can be constructed with the provided config dictionary.
     """
     fclsses = _all_subclasses(base_class)
     feature_class_names = [clsobj.__name__ for clsobj in fclsses]
@@ -57,3 +60,22 @@ def class_for_config(base_class, config):
 
     # Otherwise return the list of classes
     return f_classes
+
+def class_instance_for_config(base_class, config):
+    """
+    Retrieve an instance of a class, constructed with the given configuration.
+
+    Args:
+        base_class: object - The base class for which you want to construct a derived class of.
+
+        config: dict or Config - A configuration object specifying the class name (as the first key),
+        and class config variables (as a dict in the first value), that you want to construct the class
+        with. 
+    
+    Return:
+        object - The constructed class instance that is a derived class of the base class and has been
+        configured with the provided config.
+    """
+    # TODO [matt.c.mccallum 11.06.19]: Update other codebases to use this function where they can.
+    return class_for_config(base_class, config)(config)
+    
