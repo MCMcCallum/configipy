@@ -44,8 +44,11 @@ class Configurable(object):
         Args:
             cfg: dict - An object providing the configuration parameters for this object.
         """
-        # Save configuration dictionary
-        self._cfg = cfg
+        if not cfg[self.__class__.__name__]:
+            self._cfg = {self.__class__.__name__: {}}
+        else:
+            # Save configuration dictionary
+            self._cfg = cfg
 
         # Populate defaults
         self._populateDefaults(self._cfg[self.__class__.__name__], self._CONFIG_DEFAULTS)
