@@ -13,6 +13,8 @@ import yaml
 import os
 import json
 import hashlib
+import re
+from datetime import datetime
 
 
 class Config(dict):
@@ -40,6 +42,102 @@ class Config(dict):
             self.update(config_file)
         else:
             self.update(yaml.safe_load(config_file))
+
+        self._VAR_FUNCS = {
+            'inherit': Config._inherit,
+            'datetime': Config._datetime
+        }
+
+        self._evaluate_vars(self)
+
+    @classmethod
+    def _inherit(cls, heirarchy, term, value):
+        """
+        Macro function to inherit a value from identical keys in it's parent dictionar(ies).
+
+        Args:
+            heirarchy: dict - The dictionary heirarchy containing the key and value pair
+            that in turn contain a macro function.
+
+            term: str - The dictionary key that the macro occurs at.
+
+            value: str - The string containing the macro expression.
+
+        Return:
+            value: str - The provided value with the macro expression evaluated.
+        """
+        if 'PARENT' not in heirarchy.keys():
+            raise KeyError('No inheritable attribute "{}" found in Configipy heirarchy'.format(term))
+        return cls._inherit_recurse(heirarchy['PARENT'], term, value)
+
+    @classmethod
+    def _inherit_recurse(cls, heirarchy, term, value):
+        """
+        Recurses through all parent dicitonaries to find a matching key with whoms value
+        to use to replace the provided value.
+
+        See Config._inherit for details.
+        """
+        for child in heirarchy.keys():
+            if child == term:
+                return heirarchy[child]
+        if 'PARENT' in heirarchy.keys():
+            return cls._inherit_recurse(heirarchy['PARENT'], term, value)
+        else:
+            raise KeyError('No inheritable attribute "{}" found in Configipy heirarchy'.format(term))
+
+    @staticmethod
+    def _datetime(heirarchy, term, value):
+        """
+        Macro function to insert a datetime substring into the variable.
+
+        Args:
+            heirarchy: dict - The dictionary heirarchy containing the key and value pair
+            that in turn contain a macro function.
+
+            term: str - The dictionary key that the macro occurs at.
+
+            value: str - The string containing the macro expression.
+
+        Return:
+            value: str - The provided value with the macro expression evaluated.
+        """
+        value = value.replace(r'${datetime}', datetime.now().strftime("%Y%m%d_%H%M%S"))
+        return value
+
+    def _evaluate_vars(self, parent):
+        """
+        Performs a depth-first search through the dictionary heirarchy to
+        find all macro functions and evaluate them, replacing the macros
+        with the resulting values.
+        Note that in a single string variable macros will be evaluated in 
+        the order they occur in the string, so if one macro replaces the entire
+        variable, or overwrites other macros, they will not be evaluated.
+
+        Args:
+            parent: dict - The current top level dictionary to recurse through
+            and evaluate macros.
+        """
+        for child_key, child_var in parent.items():
+
+            # Recurse for all children that are dictionaries
+            if type(child_var) is dict and child_key is not 'PARENT':
+                parent[child_key]['PARENT'] = parent
+                self._evaluate_vars(parent[child_key])
+
+            # Evaluate functions for all children
+            while type(child_var) is str and len(re.findall(r'\$\{(.*?)\}', child_var)):
+                func_name = re.findall(r'\$\{(.*?)\}', child_var)[0]  # NOTE [matt.c.mccallum 02.14.20]: Double evaluation of regex here, not the most efficient, but we're not concerned about efficiency in Configipy.
+                try:
+                    func = self._VAR_FUNCS[func_name]
+                except KeyError:
+                    raise KeyError('No appropriate function "{}" defined in Configipy'.format(func_name))
+                child_var = func(parent, child_key, child_var)
+                parent[child_key] = child_var
+
+        # Remove the reverse linkages to parents on the way out
+        if 'PARENT' in parent.keys():
+            del parent['PARENT']
 
     def Save(self, config_file):
         """
