@@ -105,6 +105,30 @@ class Config(dict):
         value = value.replace(r'${datetime}', datetime.now().strftime("%Y%m%d_%H%M%S"))
         return value
 
+    def _evaluate_macro(self, heirarchy, term, value):
+        """
+        Evaluates all macros in the provided value.
+
+        Args:
+            heirarchy: dict - The dictionary heirarchy containing the key and value pair
+            that in turn contain a macro function.
+
+            term: str - The dictionary key that the macro occurs at.
+
+            value: str - The string containing the macro expression.
+
+        Return:
+            value: str - The provided value with the macro expression evaluated.
+        """
+        while type(value) is str and len(re.findall(r'\$\{(.*?)\}', value)):
+            func_name = re.findall(r'\$\{(.*?)\}', value)[0]  # NOTE [matt.c.mccallum 02.14.20]: Double evaluation of regex here, not the most efficient, but we're not concerned about efficiency in Configipy.
+            try:
+                func = self._VAR_FUNCS[func_name]
+            except KeyError:
+                raise KeyError('No appropriate function "{}" defined in Configipy'.format(func_name))
+            value = func(heirarchy, term, value)
+        return value
+
     def _evaluate_vars(self, parent):
         """
         Performs a depth-first search through the dictionary heirarchy to
@@ -125,15 +149,19 @@ class Config(dict):
                 parent[child_key]['PARENT'] = parent
                 self._evaluate_vars(parent[child_key])
 
-            # Evaluate functions for all children
-            while type(child_var) is str and len(re.findall(r'\$\{(.*?)\}', child_var)):
-                func_name = re.findall(r'\$\{(.*?)\}', child_var)[0]  # NOTE [matt.c.mccallum 02.14.20]: Double evaluation of regex here, not the most efficient, but we're not concerned about efficiency in Configipy.
-                try:
-                    func = self._VAR_FUNCS[func_name]
-                except KeyError:
-                    raise KeyError('No appropriate function "{}" defined in Configipy'.format(func_name))
-                child_var = func(parent, child_key, child_var)
-                parent[child_key] = child_var
+            # If it is a list of values, treat it like each element in the list has the same
+            # key and parent.
+            elif type(child_var) is list and child_key is not 'PARENT':
+                for idx, sub_var in enumerate(child_var):
+                    if type(sub_var) is dict:
+                        sub_var['PARENT'] = parent
+                        self._evaluate_vars(sub_var)
+                    elif type(sub_var) is str:
+                        child_var[idx] = self._evaluate_macro(parent, child_key, sub_var)
+
+            # If it is a string evaluate functions for all macros
+            elif type(child_var) is str:
+                parent[child_key] = self._evaluate_macro(parent, child_key, child_var)
 
         # Remove the reverse linkages to parents on the way out
         if 'PARENT' in parent.keys():
